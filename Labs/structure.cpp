@@ -1,103 +1,155 @@
 #include <iostream>
+using namespace std;
 
-template <typename T>
+#define MAX 10
+
+
 class Deque {
-private:
-    struct Node {
-        T data;
-        Node* next;
-        Node* prev;
-        Node(const T& data) : data(data), next(nullptr), prev(nullptr) {}
-    };
-
-    Node* frontNode;
-    Node* backNode;
+    int arr[MAX];
+    int front;
+    int rear;
+    int size;
 
 public:
-    Deque() : frontNode(nullptr), backNode(nullptr) {}
-
-    void push_front(const T& data) {
-        Node* newNode = new Node(data);
-        if (frontNode == nullptr) {
-            frontNode = newNode;
-            backNode = newNode;
-        }
-        else {
-            newNode->next = frontNode;
-            frontNode->prev = newNode;
-            frontNode = newNode;
-        }
+    Deque(int size) {
+        front = -1;
+        rear = 0;
+        this->size = size;
     }
 
-    void push_back(const T& data) {
-        Node* newNode = new Node(data);
-        if (backNode == nullptr) {
-            frontNode = newNode;
-            backNode = newNode;
-        }
-        else {
-            newNode->prev = backNode;
-            backNode->next = newNode;
-            backNode = newNode;
-        }
-    }
-
-    T pop_front() {
-        if (frontNode == nullptr) {
-            throw std::runtime_error("Deque is empty");
-        }
-        T data = frontNode->data;
-        Node* temp = frontNode;
-        frontNode = frontNode->next;
-        if (frontNode != nullptr) {
-            frontNode->prev = nullptr;
-        }
-        else {
-            backNode = nullptr;
-        }
-        delete temp;
-        return data;
-    }
-
-    T pop_back() {
-        if (backNode == nullptr) {
-            throw std::runtime_error("Deque is empty");
-        }
-        T data = backNode->data;
-        Node* temp = backNode;
-        backNode = backNode->prev;
-        if (backNode != nullptr) {
-            backNode->next = nullptr;
-        }
-        else {
-            frontNode = nullptr;
-        }
-        delete temp;
-        return data;
-    }
-
-    bool isEmpty() {
-        return frontNode == nullptr;
-    }
-
-    ~Deque() {
-        while (frontNode != nullptr) {
-            Node* temp = frontNode;
-            frontNode = frontNode->next;
-            delete temp;
-        }
-    }
+    void insertfront(int key);
+    void insertrear(int key);
+    void deletefront();
+    void deleterear();
+    bool isFull();
+    bool isEmpty();
+    int getFront();
+    int getRear();
 };
 
-int main() {
-    Deque<int> deque;
-    deque.push_front(1);
-    deque.push_back(2);
-    deque.push_front(3);
+bool Deque::isFull() {
+    return ((front == 0 && rear == size - 1) ||
+        front == rear + 1);
+}
 
-    while (!deque.isEmpty()) {
-        std::cout << deque.pop_front() << " ";
+bool Deque::isEmpty() {
+    return (front == -1);
+}
+
+void Deque::insertfront(int key) {
+    if (isFull()) {
+        cout << "Overflow\n"
+            << endl;
+        return;
     }
 
-    return 0;
+    if (front == -1) {
+        front = 0;
+        rear = 0;
+    }
+
+    else if (front == 0)
+        front = size - 1;  
+
+    else
+        front = front - 1;
+
+    arr[front] = key;
+}
+
+void Deque::insertrear(int key) {
+    if (isFull()) {
+        cout << " Overflow\n " << endl;
+        return;
+    }
+
+    if (front == -1) {
+        front = 0;
+        rear = 0;
+    }
+
+    else if (rear == size - 1)
+        rear = 0;
+
+    else
+        rear = rear + 1;
+
+    arr[rear] = key;
+}
+
+void Deque::deletefront() {
+    if (isEmpty()) {
+        cout << "Emptiness...\n"
+            << endl;
+        return;
+    }
+
+    if (front == rear) {
+        front = -1;
+        rear = -1;
+    }
+    else if (front == size - 1)
+        front = 0;
+
+    else
+        front = front + 1;
+}
+
+void Deque::deleterear() {
+    if (isEmpty()) {
+        cout << " Emptiness...\n"
+            << endl;
+        return;
+    }
+
+    if (front == rear) {
+        front = -1;
+        rear = -1;
+    }
+    else if (rear == 0)
+        rear = size - 1;
+    else
+        rear = rear - 1;
+}
+
+int Deque::getFront() {
+    if (isEmpty()) {
+        cout << " Emptiness...\n"
+            << endl;
+        return -1;
+    }
+    return arr[front];
+}
+
+int Deque::getRear() {
+    if (isEmpty() || rear < 0) {
+        cout << " Emptiness...\n"
+            << endl;
+        return -1;
+    }
+    return arr[rear];
+}
+
+int main() {
+    Deque dq(4);
+
+    cout << "Insert an item at the end of the queue \n";
+    dq.insertrear(5);
+    dq.insertrear(11);
+
+    cout << "The last element: "
+        << dq.getRear() << endl;
+
+    dq.deleterear();
+    cout << "After deleting the last element, the new last element: " << dq.getRear() << endl;
+
+    cout << "Inserting to the top of the queue \n";
+
+    dq.insertfront(8);
+
+    cout << "First element: " << dq.getFront() << endl;
+
+    dq.deletefront();
+
+    cout << "After deleting the first element, the new first element: " << dq.getFront() << endl;
 }
